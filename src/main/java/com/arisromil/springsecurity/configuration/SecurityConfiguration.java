@@ -29,7 +29,10 @@ public class SecurityConfiguration {
                         .anyRequest().denyAll()
                 )
                 .csrf(withDefaults())
-                .formLogin(withDefaults())
+                .formLogin((form) -> form
+                .loginPage("/login")
+                .permitAll()
+        )
                 .logout((logout) -> logout
                         .logoutSuccessUrl("/welcome")
                         .deleteCookies("JSESSIONID")
@@ -56,4 +59,6 @@ public class SecurityConfiguration {
     public static PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
+
+
 }
