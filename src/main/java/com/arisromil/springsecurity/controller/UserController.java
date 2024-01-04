@@ -24,4 +24,9 @@ public class UserController {
     public String logoutPage() {
         return "redirect:/welcome";
     }
+
+    @GetMapping("/login")
+    public String loginPage() {
+        return "login";
+    }
 }
