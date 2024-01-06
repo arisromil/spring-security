@@ -2,7 +2,6 @@ package com.arisromil.springsecurity.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
@@ -10,9 +9,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.
-        InMemoryUserDetailsManager;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -22,7 +21,7 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain filterChain1(HttpSecurity http) throws
             Exception {
-        http
+               http
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers("/", "/welcome").permitAll()
                         .requestMatchers("/authenticated").hasRole("ADMIN")
@@ -30,6 +29,10 @@ public class SecurityConfiguration {
                 )
                 .csrf(withDefaults())
                 .formLogin((form) -> form
+                        .loginPage("/login")
+                        .defaultSuccessUrl("/authenticated")
+                        .permitAll()
+                        .failureHandler(authenticationFailureHandler())
                 .loginPage("/login")
                 .permitAll()
         )
@@ -58,6 +61,11 @@ public class SecurityConfiguration {
     @Bean
     public static PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public AuthenticationFailureHandler authenticationFailureHandler() {
+        return new CustomAuthenticationFailureHandler();
     }
 
 
