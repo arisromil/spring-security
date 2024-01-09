@@ -1,5 +1,6 @@
 package com.arisromil.springsecurity.configuration;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -12,6 +13,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.www.DigestAuthenticationEntryPoint;
+import org.springframework.security.web.authentication.www.DigestAuthenticationFilter;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -27,7 +30,15 @@ public class SecurityConfiguration {
                         .requestMatchers("/authenticated").hasRole("ADMIN")
                         .anyRequest().denyAll()
                 )
-                .csrf(withDefaults())
+
+               .rememberMe((remember) -> remember
+                        .rememberMeParameter("remember-me")
+                        .key("uniqueAndSecretKey")
+                        .tokenValiditySeconds(1000)
+                        .rememberMeCookieName("rememberloginnardone")
+                        .rememberMeParameter("remember-me")
+                       )
+                // using customized login html page
                 .formLogin((form) -> form
                         .loginPage("/login")
                         .defaultSuccessUrl("/authenticated")
@@ -35,6 +46,7 @@ public class SecurityConfiguration {
                         .failureHandler(authenticationFailureHandler())
                 .loginPage("/login")
                 .permitAll()
+
         )
                 .logout((logout) -> logout
                         .logoutSuccessUrl("/welcome")
@@ -67,6 +79,7 @@ public class SecurityConfiguration {
     public AuthenticationFailureHandler authenticationFailureHandler() {
         return new CustomAuthenticationFailureHandler();
     }
+
 
 
 }
